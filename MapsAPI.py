@@ -13,15 +13,16 @@ api_server = "http://static-maps.yandex.ru/1.x/"
 
 lon, lat = request[0], request[1]
 
-params = {
-    "ll": ",".join([lon, lat]),
-    "spn": ",".join([delta, delta]),
-    "l": "map"
-}
-
 
 def load_arena():
+    params = {
+        "ll": ",".join([lon, lat]),
+        "spn": ",".join([delta, delta]),
+        "l": "map"
+    }
     response = requests.get(api_server, params=params)
+    if not response:
+        return False
 
     map_file = "map.png"
     with open(map_file, "wb") as file:
@@ -29,6 +30,7 @@ def load_arena():
     image = pygame.image.load(map_file)
     screen.blit(pygame.image.load(map_file), (0, 0))
     pygame.display.flip()
+    return True
 
 
 pygame.init()
@@ -43,39 +45,35 @@ while running:
         # !!!Это делал Артём!!!
         if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
             time = float(lat)
-            time -= float(delta) * 2
+            time -= float(delta) * 0.5
             lat = str(time)
-            params['ll'] = ",".join([lon, lat])
             load_arena()
         if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
             time = float(lat)
-            time += float(delta) * 2
+            time += float(delta) * 0.5
             lat = str(time)
-            params['ll'] = ",".join([lon, lat])
             load_arena()
         if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
             time = float(lon)
-            time -= float(delta) * 2
+            time -= float(delta) * 0.5
             lon = str(time)
-            params['ll'] = ",".join([lon, lat])
             load_arena()
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
             time = float(lon)
-            time += float(delta) * 2
+            time += float(delta) * 0.5
             lon = str(time)
-            params['ll'] = ",".join([lon, lat])
             load_arena()
         # !!!Это делал Лёша!!!
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_PAGEUP:
-                if delta == '0.002':
-                    continue
+                olddelta = delta
                 delta = str(float(delta) - 0.01)
-                params['spn'] = ",".join([delta, delta])
-                load_arena()
+                if not load_arena():
+                    delta = olddelta
             if event.key == pygame.K_PAGEDOWN:
+                olddelta = delta
                 delta = str(float(delta) + 0.01)
-                params['spn'] = ",".join([delta, delta])
-                load_arena()
+                if not load_arena():
+                    delta = olddelta
 
 pygame.quit()
