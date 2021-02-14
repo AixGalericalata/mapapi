@@ -116,12 +116,12 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_PAGEUP:
                 olddelta = delta
-                delta = str(float(delta) - 0.01)
+                delta = str(float(delta) / 2)
                 if not load_arena():
                     delta = olddelta
             if event.key == pygame.K_PAGEDOWN:
                 olddelta = delta
-                delta = str(float(delta) + 0.01)
+                delta = str(float(delta) * 2)
                 if not load_arena():
                     delta = olddelta
 
